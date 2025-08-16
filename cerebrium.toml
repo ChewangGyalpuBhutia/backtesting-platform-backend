@@ -1,0 +1,23 @@
+[cerebrium.runtime.custom]
+port = 5000
+entrypoint = ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "5000"]
+healthcheck_endpoint = "/api/health"
+
+[cerebrium.dependencies.paths]
+pip = "requirements.txt"
+
+[cerebrium.deployment]
+name = "fastapi-server"
+python_version = "3.11"
+disable_auth = true
+include = ["*"]
+exclude = [
+    ".*",
+    "__pycache__/",
+    "*.pyc",
+    "venv/",
+    "env/",
+    ".git/",
+    ".vercel/",
+    ".DS_Store"
+]
