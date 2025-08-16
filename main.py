@@ -167,13 +167,13 @@ async def get_available_symbols():
             {"symbol": "AAPL", "name": "Apple Inc."},
             {"symbol": "MSFT", "name": "Microsoft Corporation"},
             {"symbol": "GOOGL", "name": "Alphabet Inc."},
-            {"symbol": "AMZN", "name": "Amazon.com Inc."},
+            # {"symbol": "AMZN", "name": "Amazon.com Inc."},
             {"symbol": "TSLA", "name": "Tesla Inc."},
             {"symbol": "NVDA", "name": "NVIDIA Corporation"},
-            {"symbol": "SPY", "name": "SPDR S&P 500 ETF"},
-            {"symbol": "QQQ", "name": "Invesco QQQ Trust"},
-            {"symbol": "BTC-USD", "name": "Bitcoin USD"},
-            {"symbol": "ETH-USD", "name": "Ethereum USD"},
+            # {"symbol": "SPY", "name": "SPDR S&P 500 ETF"},
+            # {"symbol": "QQQ", "name": "Invesco QQQ Trust"},
+            # {"symbol": "BTC-USD", "name": "Bitcoin USD"},
+            # {"symbol": "ETH-USD", "name": "Ethereum USD"},
         ]
     }
 
@@ -211,13 +211,13 @@ async def get_available_timeframes():
                 "category": "long_term",
                 "recommended_period": "6 months - 20 years",
             },
-            {
-                "id": "1mo",
-                "name": "1 Month",
-                "description": "Monthly candles",
-                "category": "long_term",
-                "recommended_period": "2 years - 50 years",
-            },
+            # {
+            #     "id": "1mo",
+            #     "name": "1 Month",
+            #     "description": "Monthly candles",
+            #     "category": "long_term",
+            #     "recommended_period": "2 years - 50 years",
+            # },
         ]
     }
 
