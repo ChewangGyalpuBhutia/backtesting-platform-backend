@@ -17,7 +17,10 @@ app = FastAPI(title="Professional Backtesting Platform", version="1.0.0")
 # Enable CORS for frontend communication
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:3000","https://backtesting-platform-frontend.vercel.app"],
+    allow_origins=[
+        "http://localhost:3000",
+        "https://backtesting-platform-frontend.vercel.app",
+    ],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -447,28 +450,52 @@ def get_fundamentals(symbol: str):
 def get_stock_news(symbol: str):
     try:
         ticker = yf.Ticker(symbol)
-        news = ticker.news if hasattr(ticker, "news") else []
+        news = ticker.news if hasattr(ticker, "news") and ticker.news else []
         # Get top 5 latest news
         top_news = sorted(
-            news, key=lambda n: n.get("providerPublishTime", 0), reverse=True
+            news,
+            key=lambda n: (
+                n.get("providerPublishTime", 0) if isinstance(n, dict) and n else 0
+            ),
+            reverse=True,
         )[:5]
         flat_news = []
         for n in top_news:
-            # If 'content' key exists, flatten it
-            content = n.get("content", {})
+            if not isinstance(n, dict):
+                continue
+            content = n.get("content") or {}
+            # Defensive: ensure content is a dict
+            if not isinstance(content, dict):
+                content = {}
+            title = content.get("title") or n.get("title") or "No Title"
+            # Defensive: canonicalUrl/clickThroughUrl may be dict or None
+            canonical_url = content.get("canonicalUrl") or {}
+            click_url = content.get("clickThroughUrl") or {}
+            link = canonical_url.get("url") if isinstance(canonical_url, dict) else None
+            if not link:
+                link = click_url.get("url") if isinstance(click_url, dict) else None
+            if not link:
+                link = n.get("link") or ""
+            provider = content.get("provider") or {}
+            publisher = (
+                provider.get("displayName") if isinstance(provider, dict) else None
+            )
+            if not publisher:
+                publisher = n.get("publisher") or "Unknown"
+            pub_time = content.get("pubDate") or n.get("providerPublishTime") or ""
+            summary = content.get("summary") or n.get("summary") or ""
+            thumbnail = content.get("thumbnail") or {}
+            thumbnail_url = (
+                thumbnail.get("originalUrl") if isinstance(thumbnail, dict) else None
+            )
             flat_news.append(
                 {
-                    "title": content.get("title", n.get("title")),
-                    "link": content.get("canonicalUrl", {}).get("url")
-                    or content.get("clickThroughUrl", {}).get("url")
-                    or n.get("link"),
-                    "publisher": content.get("provider", {}).get(
-                        "displayName", n.get("publisher")
-                    ),
-                    "providerPublishTime": content.get("pubDate")
-                    or n.get("providerPublishTime"),
-                    "summary": content.get("summary", n.get("summary", "")),
-                    "thumbnail": content.get("thumbnail", {}).get("originalUrl", None),
+                    "title": title,
+                    "link": link,
+                    "publisher": publisher,
+                    "providerPublishTime": pub_time,
+                    "summary": summary,
+                    "thumbnail": thumbnail_url,
                 }
             )
         return flat_news
@@ -478,4 +505,5 @@ def get_stock_news(symbol: str):
 
 if __name__ == "__main__":
     import uvicorn
+
     uvicorn.run(app, host="0.0.0.0", port=8000)
